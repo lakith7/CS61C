@@ -68,7 +68,6 @@ void Mandelbrot(double threshold, u_int64_t max_iterations, ComplexNumber* cente
 			height += 1;
 			width = 0;
 		}
-		freeComplexNumber(center);
 	}
 }
 
