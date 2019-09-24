@@ -31,10 +31,10 @@ ComplexNumber* newComplexNumber(double real_component, double imaginary_componen
 //Returns a pointer to a new Complex Number equal to a*b
 ComplexNumber* ComplexProduct(ComplexNumber* a, ComplexNumber* b)
 {
-	double areal = a->real;
-	double breal = b->real;
-	double aimaginary = a->imaginary;
-	double bimaginary = b->imaginary;
+	double areal = Re(a);
+	double breal = Re(b);
+	double aimaginary = Im(a);
+	double bimaginary = Im(b);
     double newReal = (areal * breal) + (-1 * aimaginary * bimaginary);
     double newImaginary = (areal * bimaginary) + (breal * aimaginary);
 	return newComplexNumber(newReal, newImaginary);
@@ -43,13 +43,14 @@ ComplexNumber* ComplexProduct(ComplexNumber* a, ComplexNumber* b)
 //Returns a pointer to a new Complex Number equal to a+b
 ComplexNumber* ComplexSum(ComplexNumber* a, ComplexNumber* b)
 {
-	return newComplexNumber((a->real) + (b->real), (a->imaginary) + (b->imaginary));
+	struct ComplexNumber *answer = newComplexNumber((Re(a)) + (Re(b)), (Im(a)) + (Im(b)));
+	return answer;
 }
 
 //Returns the absolute value of Complex Number a
 double ComplexAbs(ComplexNumber* a)
 {
-	return sqrt(((a->real)*(a->real)) + ((a->imaginary)*(a->imaginary)));
+	return sqrt(((Re(a))*(Re(a))) + ((Im(a))*(Im(a))));
 }
 
 void freeComplexNumber(ComplexNumber* a)
