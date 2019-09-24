@@ -17,9 +17,9 @@ If the threshold is not exceeded after maxiters, the function returns 0.
 u_int64_t MandelbrotIterations(u_int64_t maxiters, ComplexNumber * point, double threshold)
 {
 	u_int64_t iters = 0;
-	struct ComplexNumber *complexY = newComplexNumber(0, 0);
+	struct ComplexNumber *complexY;
 	struct ComplexNumber *complexX = newComplexNumber(0, 0);
-	
+
 	while (maxiters > 0) {
 		iters += 1;
 		complexY = ComplexProduct(complexX, complexX);
@@ -69,10 +69,10 @@ void Mandelbrot(double threshold, u_int64_t max_iterations, ComplexNumber* cente
 			real = realCenter;
 		}
 		if (centerCoord > width) {
-			real = centerCoord - ((centerCoord - width) * increments);
+			real = realCenter - ((centerCoord - width) * increments);
 		}
 		if (centerCoord < width) {
-			real = centerCoord + ((width - centerCoord) * increments);
+			real = realCenter + ((width - centerCoord) * increments);
 		}
 		if (centerCoord == height) {
 			imaginary = imCenter;
