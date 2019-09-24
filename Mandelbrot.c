@@ -20,7 +20,7 @@ u_int64_t MandelbrotIterations(u_int64_t maxiters, ComplexNumber * point, double
 	struct ComplexNumber *complexY;
 	struct ComplexNumber *complexX = newComplexNumber(0, 0);
 
-	while (maxiters > 0) {
+	while (maxiters >= 0) {
 		if (ComplexAbs(complexX) > threshold) {
 			freeComplexNumber(complexX);
 			return iters;
