@@ -21,16 +21,16 @@ u_int64_t MandelbrotIterations(u_int64_t maxiters, ComplexNumber * point, double
 	struct ComplexNumber *complexX = newComplexNumber(0, 0);
 
 	while (maxiters > 0) {
-		iters += 1;
-		complexY = ComplexProduct(complexX, complexX);
-		freeComplexNumber(complexX);
-		complexX = ComplexSum(complexY, point);
-		freeComplexNumber(complexY);
 		if (ComplexAbs(complexX) > threshold) {
 			freeComplexNumber(complexX);
 			return iters;
 		}
+		complexY = ComplexProduct(complexX, complexX);
+		freeComplexNumber(complexX);
+		complexX = ComplexSum(complexY, point);
+		freeComplexNumber(complexY);
 		maxiters -= 1;
+		iters += 1;
 	}
 	freeComplexNumber(complexX);
 	return 0;
@@ -42,81 +42,21 @@ The number of pixels in the image is resolution * 2 + 1 in one row/column. It's 
 Scale is the the distance between center and the top pixel in one dimension.
 */
 void Mandelbrot(double threshold, u_int64_t max_iterations, ComplexNumber* center, double scale, u_int64_t resolution, u_int64_t * output) {
-	double size = ((2 * resolution) + 1) * ((2 * resolution) + 1);
-	double colrow = ((2 * resolution) + 1);
-	double scalefactor = 1/((colrow - 1)/2);
-	double centerCoord = (scale - 1)/2;
 	double realCenter = Re(center);
 	double imCenter = Im(center);
-	double increments = scale/centerCoord;
+	double increments = scale/resolution;
 	double imaginary;
 	double real;
 
-
-	/*
-	int index = 0;
-	double width = 0;
-	while (index < size) {
-		double width = index;
-		while (width >= scale) {
-			width -= scale; 
-		}
-		double height = 0;
-		double counter = scale;
-		while (index > counter) {
-			counter += scale;
-			height += 1;
-		}
-		if (centerCoord == width) {
-			real = realCenter;
-		}
-		if (centerCoord > width) {
-			real = realCenter - ((centerCoord - width) * increments);
-		}
-		if (centerCoord < width) {
-			real = realCenter + ((width - centerCoord) * increments);
-		}
-		if (centerCoord == height) {
-			imaginary = imCenter;
-		}
-		if (centerCoord > height) {
-			imaginary = imCenter + (increments * (centerCoord - height));
-		}
-		if (centerCoord < height) {
-			imaginary = imCenter - (increments * (height - centerCoord));
-		}
-		struct ComplexNumber *newPoint = newComplexNumber(real, imaginary);
-		output[index] = MandelbrotIterations(max_iterations, newPoint, threshold);
-		freeComplexNumber(newPoint);
-		index += 1;
-	} */
-
 	int length = (2 * resolution + 1);
-	int offset = 0;
 	int height = 0;
 	int width = 0;
 	int index = 0;
 	while (height < length) {
+		imaginary = imCenter + scale - (increments * height);
 		while (width < length) {
-			if (centerCoord == width) {
-				real = realCenter;
-			}
-			if (centerCoord > width) {
-				real = realCenter - ((centerCoord - width) * increments);
-			}
-			if (centerCoord < width) {
-				real = realCenter + ((width - centerCoord) * increments);
-			}
-			if (centerCoord == height) {
-				imaginary = imCenter;
-			}
-			if (centerCoord > height) {
-				imaginary = imCenter + (increments * (centerCoord - height));
-			}
-			if (centerCoord < height) {
-				imaginary = imCenter - (increments * (height - centerCoord));
-			}
-			struct ComplexNumber *newPoint = newComplexNumber(real, imaginary);
+			real = realCenter - scale + (increments * width);
+			ComplexNumber *newPoint = newComplexNumber(real, imaginary);
 			output[index] = MandelbrotIterations(max_iterations, newPoint, threshold);
 			freeComplexNumber(newPoint);
 			index += 1;
