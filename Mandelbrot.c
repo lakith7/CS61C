@@ -52,6 +52,8 @@ void Mandelbrot(double threshold, u_int64_t max_iterations, ComplexNumber* cente
 	double imaginary;
 	double real;
 
+
+	/*
 	int index = 0;
 	double width = 0;
 	while (index < size) {
@@ -87,6 +89,41 @@ void Mandelbrot(double threshold, u_int64_t max_iterations, ComplexNumber* cente
 		output[index] = MandelbrotIterations(max_iterations, newPoint, threshold);
 		freeComplexNumber(newPoint);
 		index += 1;
+	} */
+
+	int length = (2 * resolution + 1);
+	int offset = 0;
+	int height = 0;
+	int width = 0;
+	int index = 0;
+	while (height < length) {
+		while (width < length) {
+			if (centerCoord == width) {
+				real = realCenter;
+			}
+			if (centerCoord > width) {
+				real = realCenter - ((centerCoord - width) * increments);
+			}
+			if (centerCoord < width) {
+				real = realCenter + ((width - centerCoord) * increments);
+			}
+			if (centerCoord == height) {
+				imaginary = imCenter;
+			}
+			if (centerCoord > height) {
+				imaginary = imCenter + (increments * (centerCoord - height));
+			}
+			if (centerCoord < height) {
+				imaginary = imCenter - (increments * (height - centerCoord));
+			}
+			struct ComplexNumber *newPoint = newComplexNumber(real, imaginary);
+			output[index] = MandelbrotIterations(max_iterations, newPoint, threshold);
+			freeComplexNumber(newPoint);
+			index += 1;
+			width += 1;
+		}
+		height += 1;
+		width = 0;
 	}
 	freeComplexNumber(center);
 }
