@@ -20,8 +20,8 @@ u_int64_t MandelbrotIterations(u_int64_t maxiters, ComplexNumber * point, double
 	struct ComplexNumber *complexY;
 	struct ComplexNumber *complexX = newComplexNumber(0, 0);
 
-	while (maxiters > 0) {
-		if (ComplexAbs(complexX) > threshold) {
+	while (iters <= maxiters) {
+		if (ComplexAbs(complexX) >= threshold) {
 			freeComplexNumber(complexX);
 			return iters;
 		}
@@ -29,7 +29,6 @@ u_int64_t MandelbrotIterations(u_int64_t maxiters, ComplexNumber * point, double
 		freeComplexNumber(complexX);
 		complexX = ComplexSum(complexY, point);
 		freeComplexNumber(complexY);
-		maxiters -= 1;
 		iters += 1;
 	}
 	freeComplexNumber(complexX);
@@ -52,10 +51,10 @@ void Mandelbrot(double threshold, u_int64_t max_iterations, ComplexNumber* cente
 		double imaginary;
 		double real;
 
-		int length = (2 * resolution + 1);
-		int height = 0;
-		int width = 0;
-		int index = 0;
+		u_int64_t length = (2 * resolution + 1);
+		u_int64_t height = 0;
+		u_int64_t width = 0;
+		u_int64_t index = 0;
 		while (height < length) {
 			imaginary = imCenter + scale - (increments * height);
 			while (width < length) {
