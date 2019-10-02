@@ -27,7 +27,8 @@ int P3colorpalette(char* colorfile, int width, int heightpercolor, char* outputf
 	}
 	FILE* fileptr = fopen(outputfile, "w");
 	int* colorcount = malloc(sizeof(int));
-	uint8_t** returnPointer = FileToColorMap(colorfile, colorcount);
+	uint8_t** returnPointer; 
+	returnPointer = FileToColorMap(colorfile, colorcount);
 	int vertical = *colorcount * heightpercolor;
 	fprintf(fileptr, "%s ", "P3");
 	fprintf(fileptr, "%d ", width);
@@ -50,6 +51,7 @@ int P3colorpalette(char* colorfile, int width, int heightpercolor, char* outputf
 		}
 	}
 	free(returnPointer);
+	free(colorcount);
 	fclose(fileptr);
 	return 0;
 }
@@ -64,8 +66,9 @@ int P6colorpalette(char* colorfile, int width, int heightpercolor, char* outputf
 		return 1;
 	}
 	FILE* fileptr = fopen(outputfile, "w");
-	int* colorcount;
-	uint8_t** returnPointer = FileToColorMap(colorfile, colorcount);
+	int* colorcount = malloc(sizeof(int));
+	uint8_t** returnPointer;
+	returnPointer = FileToColorMap(colorfile, colorcount);
 	int vertical = *colorcount * heightpercolor;
 	fprintf(fileptr, "%s ", "P6");
 	fprintf(fileptr, "%d ", width);
@@ -81,11 +84,16 @@ int P6colorpalette(char* colorfile, int width, int heightpercolor, char* outputf
 				}
 			}
 		}
-	freeDoublePointer(returnPointer, colorcount);
+	int index = 0;
+	while (index < *colorcount) {
+		free(returnPointer[index]);
+		index += 1;
+	}
+	free(returnPointer);
 	fclose(fileptr);
+	free(colorcount);
 	return 0;
 }
-
 
 //The one piece of c code you don't have to read or understand. Still, might as well read it, if you have time.
 int main(int argc, char* argv[])

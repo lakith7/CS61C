@@ -26,19 +26,34 @@ uint8_t** FileToColorMap(char* colorfile, int* colorcount) {
 
 	fscanf(fileptr, "%u", colorcount);
 
-	uint8_t* storage1 = malloc(sizeof(uint8_t));
-	uint8_t* storage2 = malloc(sizeof(uint8_t));
-	uint8_t* storage3 = malloc(sizeof(uint8_t));
+	uint8_t* storage1 = (uint8_t*) malloc(sizeof(uint8_t));
+	uint8_t* storage2 = (uint8_t*) malloc(sizeof(uint8_t));
+	uint8_t* storage3 = (uint8_t*) malloc(sizeof(uint8_t));
+	if (storage1 == NULL || storage2 == NULL || storage3 == NULL) {
+		printf("memory allocation problems");
+		free(storage1);
+		free(storage2);
+		free(storage3);
+		fclose(fileptr);
+		return 0;
+	}
 
 	if ((*colorcount) <= 0) {
 		fclose(fileptr);
 		printf("colorcount argument is at or below zero");
+		free(storage1);
+		free(storage2);
+		free(storage3);
 		return 0;
 	}
 
 	uint8_t** returnPointer = (uint8_t**) malloc((*colorcount) * sizeof(uint8_t*));
 	if (returnPointer == NULL) {
 		printf("memory allocation problems");
+		free(storage1);
+		free(storage2);
+		free(storage3);
+		fclose(fileptr);
 		free(returnPointer);
 		return 0;
 	}
@@ -52,6 +67,9 @@ uint8_t** FileToColorMap(char* colorfile, int* colorcount) {
 			}
 			fclose(fileptr);
 			free(returnPointer);
+			free(storage1);
+			free(storage2);
+			free(storage3);
 			return 0;
 		}
 	}
@@ -63,6 +81,10 @@ uint8_t** FileToColorMap(char* colorfile, int* colorcount) {
 		if (fscanf(fileptr, "%u %u %u", storage1, storage2, storage3) != 3) {
 			printf("the input file has problematic formatting");
 			freeDoublePointer(returnPointer, colorcount);
+			free(storage1);
+			free(storage2);
+			free(storage3);
+			fclose(fileptr);
 			return 0;
 		}
 		returnPointer[index][0] = *storage1;
