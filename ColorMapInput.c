@@ -26,9 +26,9 @@ uint8_t** FileToColorMap(char* colorfile, int* colorcount) {
 
 	fscanf(fileptr, "%u", colorcount);
 
-	uint8_t* storage1 = (uint8_t*) malloc(sizeof(uint8_t));
-	uint8_t* storage2 = (uint8_t*) malloc(sizeof(uint8_t));
-	uint8_t* storage3 = (uint8_t*) malloc(sizeof(uint8_t));
+	uint8_t* storage1 = (uint8_t*) malloc(sizeof(uint8_t)*10);
+	uint8_t* storage2 = (uint8_t*) malloc(sizeof(uint8_t)*10);
+	uint8_t* storage3 = (uint8_t*) malloc(sizeof(uint8_t)*10);
 	if (storage1 == NULL || storage2 == NULL || storage3 == NULL) {
 		printf("memory allocation problems");
 		free(storage1);
