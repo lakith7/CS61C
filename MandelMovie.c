@@ -28,7 +28,24 @@ if initialscale=1024, finalscale=1, framecount=11, then your frames will have sc
 As another example, if initialscale=10, finalscale=0.01, framecount=5, then your frames will have scale 10, 10 * (0.01/10)^(1/4), 10 * (0.01/10)^(2/4), 10 * (0.01/10)^(3/4), 0.01 .
 */
 void MandelMovie(double threshold, u_int64_t max_iterations, ComplexNumber* center, double initialscale, double finalscale, int framecount, u_int64_t resolution, u_int64_t ** output){
-    //YOUR CODE HERE
+    /* Output is given as an argument, so make sure to malloc the correct amount of space before inputting it into the function. Malloc only the 2d array, the 1d part is done below */
+    double counter = 0;
+    double scale;
+    for (int index = 0; index < framecount; index += 1) {
+    	output[index] = malloc(sizeof(u_int64_t) * ((2 * resolution) + 1) * ((2 * resolution) + 1));
+    	if (counter == 0) {
+    		scale = initialscale;
+    	} else {
+    		scale = initialscale * (pow((finalscale/initialscale), (counter/(((double) framecount) - 1))));
+    	}
+    	/* framecount cannot be 0 due to checking before it is inputted into this function. */
+    	if (counter == (double) framecount) {
+    		scale = finalscale;
+    	}
+    	Mandelbrot(threshold, max_iterations, center, scale, resolution, output[index]);
+    	counter += 1;
+    }
+
 }
 
 /**************
@@ -47,10 +64,37 @@ int main(int argc, char* argv[])
 	Remember to use your solution to B.1.1 to process colorfile.
 	*/
 
-	//YOUR CODE HERE 
+	if (argc != 11) {
+		printf("%s: Wrong number of arguments, expecting 10\n", argv[0]);
+		printUsage(argv);
+		return 1;
+	}
+	double threshold, initialscale, finalscale;
+	int framecount;
+	ComplexNumber* center;
+	u_int64_t max_iterations, resolution;
 
-
-
+	threshold = atof(argv[1]);
+	max_iterations = (u_int64_t)atoi(argv[2]);
+	center = newComplexNumber(atof(argv[3]), atof(argv[4]));
+	initialscale = atof(argv[5]);
+	finalscale = atof(argv[6]);
+	framecount = atoi(argv[7]);
+	resolution = (u_int64_t)atoi(argv[8]);
+	char* output_folder = argv[9];
+	char* colorfile = argv[10];
+	if (threshold <= 0 || finalscale <= 0 || initialscale <= 0 || max_iterations <= 0 || resolution < 0) {
+		printf("threshold, finalscale, initalscale, resolution, and max_iterations must be greater than 0");
+		return 1;
+	}
+	if (framecount > 10000 || framecount <= 0) {
+		printf("invalid framecount input");
+		return 1;
+	}
+	if ((framecount == 1) && (initialscale != finalscale)) {
+		printf("invalid framecount and initialscale/finalscale input");
+		return 1;
+	}
 
 	//STEP 2: Run MandelMovie on the correct arguments.
 	/*
@@ -58,8 +102,25 @@ int main(int argc, char* argv[])
 	If allocation fails, free all the space you have already allocated (including colormap), then return with exit code 1.
 	*/
 
-	//YOUR CODE HERE 
+	int* colorcount = malloc(sizeof(int));
+	if (colorcount == NULL) {
+		printf("memory allocation problems");
+		free(colorcount);
+		return 1;
+	}
+	uint8_t** colorMap = FileToColorMap(colorfile, colorcount);
 
+	uint8_t** output = (uint8_t**) malloc(framecount * sizeof(uint8_t*));
+
+	if (output == NULL) {
+		printf("memory allocation problems");
+		freeDoublePointer(colorMap);
+		free(output);
+		free(colorcount);
+		return 1;
+	}
+
+	MandelMovie(threshold, max_iterations, center, initialscale, finalscale, framecount, resolution, output);
 
 
 	//STEP 3: Output the results of MandelMovie to .ppm files.
@@ -70,8 +131,54 @@ int main(int argc, char* argv[])
 	As a reminder, we are using P6 format, not P3.
 	*/
 
-	//YOUR CODE HERE 
 
+
+
+	uint8_t* color;
+	int frameNumber = 0;
+	int indexer;
+
+
+	for (int i = 0; i < framecount; i += 1) {
+		char* fileName = (char*) malloc((sizeof(char)) * (16 + (strlen(output_folder))));
+		sprintf(fileName, "%s/frame%05d.ppm", output_folder, frameNumber);
+		frameNumber += 1;
+		FILE* fileptr = fopen(fileName, "w");
+		fprintf(fileptr, "P6 %lu %lu 255\n", ((2 * resolution) + 1), ((2 * resolution) + 1)); 
+		uint8_t* outputList = (uint8_t*) malloc(3 * ((2*resolution)+1) * ((2*resolution)+1) * sizeof(uint8_t));
+		int index = 0;
+		if (outputList == NULL) {
+			free(outputList);
+			fclose(fileptr);
+			free(fileName);
+			return 1;
+		}
+		for (int y = 0; y < ((2 * resolution + 1) * (2 * resolution + 1)); y++) {
+					if (output[i][y] == 0) {
+						outputList[index] = 0;
+						index += 1;
+						outputList[index] = 0;
+						index += 1;
+						outputList[index] = 0;
+						index += 1;
+					} else {
+						/* Pretty sure modulus has to be between two ints, so cast if needed. */
+						indexer = ((((int) output[i][y]) % *colorcount) - 1) % *colorcount;
+						color = colorMap[indexer];
+						outputList[index] = color[0];
+						index += 1;
+						outputList[index] = color[1];
+						index += 1;
+						outputList[index] = color[2];
+						index += 1;
+					}
+
+		}
+		fwrite(outputList, sizeof(uint8_t), 3 * ((2*resolution)+1) * ((2*resolution)+1), fileptr);
+		free(fileName);
+		fclose(fileptr);
+		free(outputList);
+	}
 
 
 
@@ -79,12 +186,16 @@ int main(int argc, char* argv[])
 	/*
 	Make sure there's no memory leak.
 	*/
-	//YOUR CODE HERE 
-
-
-
-
+	freeComplexNumber(center);
+	freeDoublePointer(colorMap, colorcount);
+	free(colorcount);
+	for (int q = 0; q < framecount; q++) {
+		free(output[q]);
+	}
+	free(output);
 
 	return 0;
 }
+
+
 
