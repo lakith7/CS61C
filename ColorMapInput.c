@@ -26,9 +26,9 @@ uint8_t** FileToColorMap(char* colorfile, int* colorcount) {
 
 	fscanf(fileptr, "%u", colorcount);
 
-	uint8_t* storage1 = (uint8_t*) malloc(sizeof(uint8_t)*10);
-	uint8_t* storage2 = (uint8_t*) malloc(sizeof(uint8_t)*10);
-	uint8_t* storage3 = (uint8_t*) malloc(sizeof(uint8_t)*10);
+	unsigned int* storage1 = (unsigned int*) malloc(sizeof(unsigned int)*10);
+	unsigned int* storage2 = (unsigned int*) malloc(sizeof(unsigned int)*10);
+	unsigned int* storage3 = (unsigned int*) malloc(sizeof(unsigned int)*10);
 	if (storage1 == NULL || storage2 == NULL || storage3 == NULL) {
 		printf("memory allocation problems");
 		free(storage1);
@@ -74,11 +74,11 @@ uint8_t** FileToColorMap(char* colorfile, int* colorcount) {
 		}
 	}
 	/* Do we have to malloc the null character or nah? */
-	int index = 0;
+	int index = 0;f
 	int numberColors = *colorcount;
 	printf("%d", numberColors);
 	while (numberColors > 0) {
-		if (fscanf(fileptr, "%u %u %u", storage1, storage2, storage3) != 3) {
+		if ((fscanf(fileptr, "%u %u %u", storage1, storage2, storage3) != 3) || *storage1 > 255 || *storage2 > 255 || *storage3 > 255) {
 			printf("the input file has problematic formatting");
 			freeDoublePointer(returnPointer, colorcount);
 			free(storage1);
