@@ -74,7 +74,7 @@ uint8_t** FileToColorMap(char* colorfile, int* colorcount) {
 		}
 	}
 	/* Do we have to malloc the null character or nah? */
-	int index = 0;f
+	int index = 0;
 	int numberColors = *colorcount;
 	printf("%d", numberColors);
 	while (numberColors > 0) {
