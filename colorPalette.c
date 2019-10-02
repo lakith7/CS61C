@@ -50,6 +50,11 @@ int P3colorpalette(char* colorfile, int width, int heightpercolor, char* outputf
 			}
 		}
 	}
+	int index = 0;
+	while (index < *colorcount) {
+		free(returnPointer[index]);
+		index += 1;
+	}
 	free(returnPointer);
 	free(colorcount);
 	fclose(fileptr);
@@ -66,6 +71,10 @@ int P6colorpalette(char* colorfile, int width, int heightpercolor, char* outputf
 		return 1;
 	}
 	FILE* fileptr = fopen(outputfile, "w");
+	if (fileptr == NULL) {
+		fclose(fileptr);
+		return 1;
+	}
 	int* colorcount = malloc(sizeof(int));
 	uint8_t** returnPointer;
 	returnPointer = FileToColorMap(colorfile, colorcount);
